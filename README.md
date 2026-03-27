@@ -51,7 +51,15 @@ Rear Breakage
 Rear Crushed
 Rear Normal
 🧪 Example
+### 📸 App Screenshot
 
+![App Screenshot](app_screenshot.jpg)
+
+---
+
+### 🎥 Demo Video
+
+[Watch Demo](https://drive.google.com/file/d/1kC1fz_38YpQ7FWwL6-9_RPf6mmwN9P1f/view?usp=drive_link)
 Example Output:
 
 Prediction: Front Crushed
@@ -72,4 +80,3 @@ Convert to mobile/web product
 
 Tannu Nirupam
 🔗 https://github.com/TannuNirupam
-
