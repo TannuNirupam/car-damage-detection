@@ -1,1 +1,5 @@
 saved_model.pth
+__pycache__/
+*.pyc
+.DS_Store
+temp_file.jpg
