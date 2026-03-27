@@ -2,8 +2,8 @@ from PIL import Image
 import torch
 import torch.nn as nn
 from torchvision import models, transforms
+import streamlit as st
 
-# Class labels
 class_names = [
     'Front Breakage',
     'Front Crushed',
@@ -13,22 +13,18 @@ class_names = [
     'Rear Normal'
 ]
 
-# Model definition
 class CarClassifierResNet(nn.Module):
     def __init__(self, num_classes=len(class_names), dropout_rate=0.5):
         super(CarClassifierResNet, self).__init__()
 
         self.model = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
 
-        # Freeze layers
         for param in self.model.parameters():
             param.requires_grad = False
 
-        # Unfreeze last block
         for param in self.model.layer4.parameters():
             param.requires_grad = True
 
-        # Replace FC
         self.model.fc = nn.Sequential(
             nn.Dropout(dropout_rate),
             nn.Linear(self.model.fc.in_features, num_classes)
@@ -38,16 +34,21 @@ class CarClassifierResNet(nn.Module):
         return self.model(x)
 
 
-# Prediction function
-def predict(image_input, model_path="saved_model.pth"):
+@st.cache_resource
+def load_model():
+    model = CarClassifierResNet(num_classes=len(class_names))
+    model.load_state_dict(torch.load("saved_model.pth", map_location=torch.device('cpu')))
+    model.eval()
+    return model
 
-    # Handle both uploaded file & camera image
+
+def predict(image_input):
+
     if isinstance(image_input, Image.Image):
         image = image_input.convert("RGB")
     else:
         image = Image.open(image_input).convert("RGB")
 
-    # Transform
     transform = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
@@ -60,23 +61,11 @@ def predict(image_input, model_path="saved_model.pth"):
 
     image_tensor = transform(image).unsqueeze(0)
 
-    # Load model
-    model = CarClassifierResNet(num_classes=len(class_names))
-    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-    model.eval()
+    model = load_model()
 
-    # Prediction
     with torch.no_grad():
         outputs = model(image_tensor)
-
         probs = torch.softmax(outputs, dim=1)
         confidence, predicted_class = torch.max(probs, 1)
 
-        confidence = confidence.item()
-        predicted_label = class_names[predicted_class.item()]
-
-        # Handle uncertainty
-        if confidence < 0.6:
-            return "Uncertain Prediction", confidence
-
-        return predicted_label, confidence
+        return class_names[predicted_class.item()], confidence.item()

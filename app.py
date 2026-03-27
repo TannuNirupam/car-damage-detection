@@ -2,27 +2,19 @@ import streamlit as st
 from PIL import Image
 from model_helper import predict
 
-# -----------------------------
-# ⚙️ PAGE CONFIG
-# -----------------------------
+# Page config
 st.set_page_config(page_title="Car Damage Detection", layout="wide")
 
-# -----------------------------
-# 🏷️ TITLE
-# -----------------------------
+# Title
 st.title("🚗 Car Damage Detection")
 st.markdown("Upload an image or use your webcam to detect car damage.")
 
 st.markdown("---")
 
-# -----------------------------
-# 📐 LAYOUT (2 COLUMNS)
-# -----------------------------
+# Layout
 col1, col2 = st.columns(2)
 
-# -----------------------------
-# 📂 LEFT → IMAGE UPLOAD
-# -----------------------------
+# LEFT: Upload
 with col1:
     st.subheader("📂 Upload Image")
 
@@ -41,13 +33,11 @@ with col1:
         st.info(f"Confidence: {confidence:.2f}")
         st.progress(int(confidence * 100))
 
-# -----------------------------
-# 📸 RIGHT → CAMERA (TOGGLE)
-# -----------------------------
+
+# RIGHT: Camera
 with col2:
     st.subheader("📸 Camera Input")
 
-    # Toggle ON/OFF
     camera_on = st.toggle("Open Camera")
 
     if camera_on:
